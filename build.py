@@ -331,6 +331,9 @@ FROM ${{BASE_IMAGE}} AS tritonserver_onnx
 # Onnx Runtime release version from top of file
 ARG ONNX_RUNTIME_VERSION
 
+# Ensure apt-get won't prompt for selecting options
+ENV DEBIAN_FRONTEND=noninteractive
+
 WORKDIR /workspace
 
 # Get release version of Onnx Runtime
@@ -349,7 +352,7 @@ COPY build/onnxruntime /tmp/trtis/build/onnxruntime
 
 RUN sed -i "s/backend-test-tools.*//" ${{SCRIPT_DIR}}/install_onnx.sh
 RUN cp -r ${{SCRIPT_DIR}} /tmp/scripts && \
-    ${{SCRIPT_DIR}}/install_ubuntu.sh -p 3.6 -o 18.04 && ${{SCRIPT_DIR}}/install_deps.sh -p 3.6
+    ${{SCRIPT_DIR}}/install_ubuntu.sh -p 3.6 -o 20.04 && ${{SCRIPT_DIR}}/install_deps.sh -p 3.6
 
 ENV PATH /usr/bin:$PATH
 RUN cmake --version
@@ -407,6 +410,9 @@ FROM ${{BASE_IMAGE}} AS tritonserver_build
 
 ARG TRITON_VERSION
 ARG TRITON_CONTAINER_VERSION
+
+# Ensure apt-get won't prompt for selecting options
+ENV DEBIAN_FRONTEND=noninteractive
 
 # libgoogle-glog0v5 is needed by caffe2 libraries.
 # libcurl4-openSSL-dev is needed for GCS
@@ -638,6 +644,9 @@ RUN userdel tensorrt-server > /dev/null 2>&1 || true && \
     fi && \
     [ `id -u $TRITON_SERVER_USER` -eq 1000 ] && \
     [ `id -g $TRITON_SERVER_USER` -eq 1000 ]
+
+# Ensure apt-get won't prompt for selecting options
+ENV DEBIAN_FRONTEND=noninteractive
 
 # libgoogle-glog0v5 is needed by caffe2 libraries.
 # libcurl is needed for GCS
