@@ -95,8 +95,7 @@ cp -r /data/inferenceserver/${REPO_VERSION}/tf_model_store/inception_v1_graphdef
 cp -r /data/inferenceserver/${REPO_VERSION}/perf_model_store/resnet50v1.5_fp16_savedmodel $DATADIR
 
 # Set up the ensemble model repository
-cp -r /data/inferenceserver/${REPO_VERSION}/tf_model_store/inception_v1_graphdef/1 ensemble_model_repository/inception_graphdef/1
-mkdir -p ensemble_model_repository/preprocess_inception_ensemble/1
+cp -r ../ensemble_models/image_preprocess_ensemble_example ensemble_model_repository
 
 # Generating test data
 mkdir -p $TESTDATADIR
