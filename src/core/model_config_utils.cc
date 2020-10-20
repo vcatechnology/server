@@ -1179,6 +1179,18 @@ ValidateModelConfig(
         }
       }
     }
+
+    // If direct strategy is enabled make sure the minimum slot utilization is
+    // in range [0.0, 1.0]
+    if (config.sequence_batching().has_direct()) {
+        if ((config.sequence_batching().direct().minimum_slot_utilization() < 0.0)
+        || (config.sequence_batching().direct().minimum_slot_utilization() > 1.0)) {
+          return Status(
+              Status::Code::INVALID_ARG,
+              "sequence batching minimum slot utilization must be in range "
+              "[0.0, 1.0] for " + config.name());
+      }
+    }
   }
 
   // If ensemble scheduling is specified, validate it.  Otherwise,
@@ -1563,6 +1575,7 @@ ValidateModelConfigInt64()
       "microseconds",
       "ModelConfig::dynamic_batching::priority_queue_policy::value::default_"
       "timeout_microseconds",
+      "ModelConfig::sequence_batching::direct::max_queue_delay_microseconds",
       "ModelConfig::sequence_batching::oldest::max_queue_delay_microseconds",
       "ModelConfig::sequence_batching::max_sequence_idle_microseconds",
       "ModelConfig::ensemble_scheduling::step::model_version",
@@ -1760,6 +1773,7 @@ ModelConfigToJson(
   }
 
   // Fix sequence_batching::oldest::max_queue_delay_microseconds,
+  // sequence_batching::direct::max_queue_delay_microseconds,
   // sequence_batching::max_sequence_idle_microseconds
   {
     triton::common::TritonJson::Value sb;
@@ -1770,6 +1784,11 @@ ModelConfigToJson(
       if (sb.Find("oldest", &oldest)) {
         RETURN_IF_ERROR(
             FixInt(config_json, oldest, "max_queue_delay_microseconds"));
+      }
+      triton::common::TritonJson::Value direct;
+      if (sb.Find("direct", &direct)) {
+        RETURN_IF_ERROR(
+            FixInt(config_json, direct, "max_queue_delay_microseconds"));
       }
     }
   }
